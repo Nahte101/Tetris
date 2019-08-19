@@ -44,6 +44,48 @@ namespace Tetris
             this.startOfFieldY = (screenHeight / 16);
             this.startOfFieldY+= 5;
         }
+        public void chooseBlock()
+        {
+            Random rand = new Random();
+            int num = rand.Next(0, 7);
+            switch(num)
+            {
+                case 1:
+                    currentTetromino = new Tetromino(Tetromino.I);
+                    break;
+                case 2:
+                    currentTetromino = new Tetromino(Tetromino.J);
+                    break;
+                case 3:
+                    currentTetromino = new Tetromino(Tetromino.L);
+                    break;
+                case 4:
+                    currentTetromino = new Tetromino(Tetromino.O);
+                    break;
+                case 5:
+                    currentTetromino = new Tetromino(Tetromino.S);
+                    break;
+                case 6:
+                    currentTetromino = new Tetromino(Tetromino.T);
+                    break;
+                default:
+                    currentTetromino = new Tetromino(Tetromino.Z);
+                    break;
+            }
+        }
+
+        public void placeBlock()
+        {
+            //insert the current tetrominos values in pieces into the playfield
+            for(int i = 0; i < currentTetromino.Pieces.GetLength(0);i++)
+            {
+                for(int c = 0; c < currentTetromino.Pieces.GetLength(1); c++)
+                {
+                    playField[currentTetromino.X+i, currentTetromino.Y+c] = currentTetromino.Pieces[i, c];
+                }
+            }
+        }
+
         //For now false will be red and true will be green
         public void drawPlayField(SpriteBatch spriteBatch)
         {
