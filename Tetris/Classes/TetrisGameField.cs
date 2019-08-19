@@ -81,17 +81,17 @@ namespace Tetris
             //Add 5 pixels to width and height of the lines here TODO
 
             //Horizontal Top Line
-            spriteBatch.Draw(blankRectSprite, new Rectangle( (screenWidth/2 )-( ( widthInBlocks* (blockSize+gap) ) /2)
-            ,(screenHeight/16), widthInBlocks * (blockSize + gap), 1 ), Color.White);
+            spriteBatch.Draw(blankRectSprite, new Rectangle((screenWidth/2 )-( ( widthInBlocks* (blockSize+gap) ) /2)
+            ,(screenHeight/16), widthInBlocks * (blockSize + gap)+gap, 1 ), Color.White);
             //Horizontal Bottom Line
             spriteBatch.Draw(blankRectSprite, new Rectangle((screenWidth / 2) - ((widthInBlocks * (blockSize + gap)) / 2)
-            , screenHeight- (screenHeight / 16), widthInBlocks * (blockSize + gap), 1), Color.White);
+            , screenHeight- (screenHeight / 16)+gap, widthInBlocks * (blockSize + gap)+gap, 1), Color.White);
             //Vertical Left Line
             spriteBatch.Draw(blankRectSprite, new Rectangle( (screenWidth/2)-( (widthInBlocks * (blockSize + gap) ) /2 ) 
-                , (screenHeight / 16), 1,screenHeight-( 2 * (screenHeight/16) ) ), Color.White);
+                , (screenHeight / 16), 1,screenHeight-( 2 * (screenHeight/16) )+ gap ), Color.White);
             //Vertical Right Line
-            spriteBatch.Draw(blankRectSprite, new Rectangle((screenWidth / 2) + ((widthInBlocks * (blockSize + gap)) / 2)
-                , (screenHeight / 16), 1, screenHeight - (2 * (screenHeight / 16))), Color.White);
+            spriteBatch.Draw(blankRectSprite, new Rectangle(gap+(screenWidth / 2) + ((widthInBlocks * (blockSize + gap)) / 2)
+                , (screenHeight / 16), 1, screenHeight - (2 * (screenHeight / 16))+gap ), Color.White);
         }
     }
 }
