@@ -49,9 +49,9 @@ namespace Tetris
                     {
                         falseCounter++;
                     }
-                    else if(falseCounter == 4)
+                    if(falseCounter == 4)
                     {
-                        falseCounter++;
+                        rowCounter++;
                     }
                 }
             }

@@ -84,11 +84,11 @@ namespace Tetris
         public void placeBlock()
         {
             //insert the current tetrominos values in pieces into the playfield
-            for(int i = 0; i < currentTetromino.Pieces.GetLength(0);i++)
+            for(int i = 0; i < currentTetromino.Pieces.GetLength(0)-currentTetromino.EmptyRowsFromBottom();i++)
             {
                 for(int c = 0; c < currentTetromino.Pieces.GetLength(1); c++)
                 {
-                    playField[currentTetromino.X+i, currentTetromino.Y+c] = currentTetromino.Pieces[i, c];
+                    playField[currentTetromino.X+c, currentTetromino.Y+i] = currentTetromino.Pieces[i, c];
                 }
             }
         }
