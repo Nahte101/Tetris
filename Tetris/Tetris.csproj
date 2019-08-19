@@ -41,8 +41,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Classes\Game1.cs" />
+    <Compile Include="Classes\Program.cs" />
+    <Compile Include="Classes\TetrisGameField.cs" />
+    <Compile Include="Classes\Tetromino.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
