@@ -12,21 +12,23 @@ namespace Tetris
 {
     class TetrisGameField
     {
-        private static bool[,] I = { { true, false, false, false }, { true, false, false, false }, { true, false, false, false }, { true, false, false, false } };
-        private static bool[,] J = { { true, true, false, false }, { true, false, false, false }, { true, false, false, false }, { false, false, false, false } };
-        private static bool[,] L = { { true, true, false, false }, { false, true, false, false }, { false, true, false, false }, { false, false, false, false } };
-        private static bool[,] O = { { true, true, false, false }, { true, true, false, false }, { false, false, false, false }, { false, false, false, false } };
-        private static bool[,] S = { { true, false, false, false }, { true, true, false, false }, { false, true, false, false }, { false, false, false, false } };
-        private static bool[,] T = { { true, false, false, false }, { true, true, false, false }, { true, false, false, false }, { false, false, false, false } };
-        private static bool[,] Z = { { false, true, false, false }, { true, true, false, false }, { true, false, false, false }, { false, false, false, false } };
-
+        
         private Texture2D blankRectSprite;
         
         private GraphicsDeviceManager graphics;
-        private int screenWidth;
-        private int screenHeight;
 
-        private bool[,] playField = new bool[10, 40];
+        int widthInBlocks;
+        int heightInBlocks;
+        int screenWidth;
+        int screenHeight;
+        int blockSize = 10;
+        int gap = 5;
+        int startOfFieldX;
+        int startOfFieldY;
+
+        private bool[,] playField = new bool[10, 28];
+
+        private Tetromino currentTetromino;
         private List<Tetromino> fallenPieces = new List<Tetromino>();
 
         public TetrisGameField(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
@@ -34,8 +36,39 @@ namespace Tetris
             this.graphics = graphics;//Might be a problem if resolution changes on the fly
             this.screenHeight = graphics.PreferredBackBufferHeight;
             this.screenWidth = graphics.PreferredBackBufferWidth;
+            this.widthInBlocks = playField.GetLength(0);
+            this.heightInBlocks = playField.GetLength(1);
 
-            
+            this.startOfFieldX = (screenWidth / 2) - ((widthInBlocks * (blockSize + gap)) / 2);
+            this.startOfFieldX+= 5;
+            this.startOfFieldY = (screenHeight / 16);
+            this.startOfFieldY+= 5;
+        }
+        //For now false will be red and true will be green
+        public void drawPlayField(SpriteBatch spriteBatch)
+        {
+            Rectangle baseblock = new Rectangle(0, 0, 10, 10);
+            Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            redSprite.SetData(new Color[] { Color.Red });
+            Texture2D greenSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            greenSprite.SetData(new Color[] { Color.Green });
+
+
+            for (int i=0;i<playField.GetLength(0);i++)
+            {
+                for(int c=0;c< playField.GetLength(1); c++)
+                {
+                    baseblock.Location = new Point(startOfFieldX+(i*(blockSize + gap) )  ,startOfFieldY+( c* (blockSize + gap) ) );
+                    if(playField[i,c])
+                    {
+                        spriteBatch.Draw(greenSprite,baseblock,Color.White);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(redSprite, baseblock, Color.White);
+                    }
+                }
+            }
         }
         public void drawOutline(SpriteBatch spriteBatch)
         {
@@ -45,12 +78,7 @@ namespace Tetris
             //Variables for usage in drawing of box (playing field will be 10 by 40 blocks default same as playfield)
             // and each block will be 10 by 10 pixels with a 5 block gap on the x and y
 
-            int widthInBlocks = playField.GetLength(0);
-            int heightInBlocks = playField.GetLength(1);
-            int screenWidth = graphics.PreferredBackBufferWidth;
-            int screenHeight = graphics.PreferredBackBufferHeight;
-            int blockSize = 10;
-            int gap = 5;
+            //Add 5 pixels to width and height of the lines here TODO
 
             //Horizontal Top Line
             spriteBatch.Draw(blankRectSprite, new Rectangle( (screenWidth/2 )-( ( widthInBlocks* (blockSize+gap) ) /2)

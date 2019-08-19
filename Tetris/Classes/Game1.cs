@@ -54,7 +54,7 @@ namespace Tetris
             spriteBatch.Begin();
 
             gameField.drawOutline(spriteBatch);
-
+            gameField.drawPlayField(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
