@@ -8,7 +8,7 @@ namespace Tetris
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        bool start;
         TetrisGameField gameField;
 
         public Game1()
@@ -21,6 +21,7 @@ namespace Tetris
         {
             // TODO: Add your initialization logic here
             gameField = new TetrisGameField(spriteBatch, graphics);
+            start = false;
             base.Initialize();
         }
 
@@ -41,10 +42,16 @@ namespace Tetris
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            gameField.chooseBlock();
+            
+            if (!start)
+            { 
+                gameField.chooseBlock();
+                start = true;
+            }
+            gameField.update(gameTime);
+            gameField.resetField();
             gameField.placeBlock();
-
+            
             base.Update(gameTime);
         }
 

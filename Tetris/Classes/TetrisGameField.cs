@@ -73,7 +73,14 @@ namespace Tetris
                     break;
             }
         }
-
+        public void update(GameTime gameTime)
+        {
+            currentTetromino.update(gameTime);
+        }
+        public void resetField()//Do before every drawField call
+        {
+            playField = new bool[10, 28];
+        }
         public void placeBlock()
         {
             //insert the current tetrominos values in pieces into the playfield

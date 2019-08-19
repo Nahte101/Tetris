@@ -23,11 +23,11 @@ namespace Tetris
         private bool[,] pieces;
         //x and why are indexs inside of the playfield relative to the top left of pieces in this class
         private int x = 5;
-        private int y = 0;
+        private double y = 0d;
 
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
-        public int Y { get { return y; } }
+        public int Y { get { return (int)y; } }
 
         public Tetromino(bool[,] pieces)
         {
@@ -35,13 +35,13 @@ namespace Tetris
         }
         public void update(GameTime gameTime)
         {
-            fall();
+            fall(gameTime);
         }
-        public void fall()
+        public void fall(GameTime gameTime)
         {
-            if (y + 4 < 28)
+            if ((int)y + 4 < 28)
             {
-                y++;
+                y+= 1*gameTime.ElapsedGameTime.TotalSeconds;
             }
         }
 
