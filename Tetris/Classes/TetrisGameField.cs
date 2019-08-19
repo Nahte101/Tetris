@@ -92,6 +92,11 @@ namespace Tetris
                 }
             }
         }
+        public void drawDebugStats(SpriteBatch spriteBatch,SpriteFont font)
+        {
+            spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.EmptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
+            currentTetromino.drawPieces(spriteBatch, 100, 100);
+        }
 
         //For now false will be red and true will be green
         public void drawPlayField(SpriteBatch spriteBatch)

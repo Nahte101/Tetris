@@ -8,6 +8,8 @@ namespace Tetris
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont font;
+
         bool start;
         TetrisGameField gameField;
 
@@ -29,7 +31,7 @@ namespace Tetris
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            font = Content.Load<SpriteFont>("font");
             // TODO: use this.Content to load your game content here
         }
 
@@ -63,6 +65,8 @@ namespace Tetris
 
             gameField.drawOutline(spriteBatch);
             gameField.drawPlayField(spriteBatch);
+            gameField.drawDebugStats(spriteBatch, font);
+
             spriteBatch.End();
 
             base.Draw(gameTime);

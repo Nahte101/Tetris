@@ -37,12 +37,85 @@ namespace Tetris
         {
             fall(gameTime);
         }
+        public int EmptyRowsFromBottom()
+        {
+            int rowCounter = 0;
+            for(int i = 3; i >= 0  ;i--)
+            {
+                int falseCounter = 0;
+                for(int c = 0; c < 4 ; c++ )
+                {
+                    if(pieces[i,c] == false)
+                    {
+                        falseCounter++;
+                    }
+                    else if(falseCounter == 4)
+                    {
+                        falseCounter++;
+                    }
+                }
+            }
+            return rowCounter;
+        }
+        public void drawPieces(SpriteBatch spriteBatch,int x, int y)
+        {
+            Texture2D green = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            green.SetData(new Color[] { Color.ForestGreen });
+
+            Texture2D red = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            red.SetData(new Color[] { Color.Red });
+
+            Vector2 pos = new Vector2(600, 50);
+            int spacing = 5;
+            int size = 10;
+
+            for (int i = 0; i < pieces.GetLength(0); i++)
+            {
+                for (int c = 0; c < pieces.GetLength(1); c++)
+                {
+                    if (pieces[i, c] == true)
+                    {
+                        spriteBatch.Draw(green, new Rectangle((((int)pos.X - 500 + ((c + 1)) * size) + spacing * c),
+                             ((int)pos.Y + 200 + ((i + 1) * size) + spacing * i), 10, 10), Color.White);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(red, new Rectangle((((int)pos.X - 500 + ((c + 1)) * size) + spacing * c),
+                             ((int)pos.Y + 200 + ((i + 1) * size) + spacing * i), 10, 10), Color.White);
+                    }
+                }
+            }
+        }
         public void fall(GameTime gameTime)
         {
-            if ((int)y + 4 < 28)
+            switch(EmptyRowsFromBottom())
             {
-                y+= 1*gameTime.ElapsedGameTime.TotalSeconds;
+                case 0:
+                    if ((int)y + 4 < 28)
+                    {
+                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    break;
+                case 1:
+                    if((int)y + 3 < 28)
+                    {
+                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    break;
+                case 2:
+                    if ((int)y + 2 < 28)
+                    {
+                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    break;
+                case 3:
+                    if ((int)y + 1 < 28)
+                    {
+                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    break;
             }
+            
         }
 
     }
