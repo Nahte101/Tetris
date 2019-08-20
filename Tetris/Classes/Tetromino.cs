@@ -24,10 +24,12 @@ namespace Tetris
         //x and why are indexs inside of the playfield relative to the top left of pieces in this class
         private int x = 5;
         private double y = 0d;
+        private double xMovTimer = 0.5d;
 
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
         public int Y { get { return (int)y; } }
+        public double XMovTimer { get { return xMovTimer; } }
 
         public Tetromino(bool[,] pieces)
         {
@@ -35,7 +37,24 @@ namespace Tetris
         }
         public void update(GameTime gameTime)
         {
+            KeyboardState kState = Keyboard.GetState();
+            movX(kState, gameTime);
             fall(gameTime);
+        }
+        public void movX(KeyboardState kState, GameTime gameTime)
+        {
+            if(x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
+            {
+                x--;
+                xMovTimer = 0.5d;
+            }
+            else if(x < 19 && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
+            {
+                x++;
+                xMovTimer = 0.5d;
+            }
+            else
+            { xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds; }
         }
         public int EmptyRowsFromBottom()
         {

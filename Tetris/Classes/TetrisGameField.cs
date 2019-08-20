@@ -76,6 +76,8 @@ namespace Tetris
         public void update(GameTime gameTime)
         {
             currentTetromino.update(gameTime);
+            
+
         }
         public void resetField()//Do before every drawField call
         {
@@ -95,6 +97,8 @@ namespace Tetris
         public void drawDebugStats(SpriteBatch spriteBatch,SpriteFont font)
         {
             spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.EmptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
+            spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0,50), Color.White);
+
             currentTetromino.drawPieces(spriteBatch, 100, 100);
         }
 
@@ -108,9 +112,9 @@ namespace Tetris
             greenSprite.SetData(new Color[] { Color.Green });
 
 
-            for (int i=0;i<playField.GetLength(0);i++)
+            for (int i=0; i < playField.GetLength(0);i++)
             {
-                for(int c=0;c< playField.GetLength(1); c++)
+                for(int c = 0; c < playField.GetLength(1); c++)
                 {
                     baseblock.Location = new Point(startOfFieldX+(i*(blockSize + gap) )  ,startOfFieldY+( c* (blockSize + gap) ) );
                     if(playField[i,c])
