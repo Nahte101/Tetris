@@ -25,8 +25,8 @@ namespace Tetris
         private int x = 5;
         private double y = 0d;
         private double xMovTimer = 0.5d;
-        private double yMovTimer = 0.5d;
-
+        private double yMovTimer = 0.3d;
+        private bool isFallen;
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
         public int Y { get { return (int)y; } }
@@ -35,6 +35,10 @@ namespace Tetris
         public Tetromino(bool[,] pieces)
         {
             this.pieces = pieces;//Might cause problems since it is a shallow copy
+        }
+        public bool isBlockFallen()
+        {
+            return (24 + emptyRowsFromBottom() == y);
         }
         public void update(GameTime gameTime)
         {
@@ -57,7 +61,9 @@ namespace Tetris
                 xMovTimer = 0.5d;
             }
             else
-            { xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds; }
+            {
+                xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+            }
         }
         public void speedUp(KeyboardState kState)
         {

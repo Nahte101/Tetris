@@ -76,12 +76,34 @@ namespace Tetris
         public void update(GameTime gameTime)
         {
             currentTetromino.update(gameTime);
-            
+            if(currentTetromino.isBlockFallen())
+            {
+                fallenPieces.Add(currentTetromino);   
+                chooseBlock();
+            }
 
         }
         public void resetField()//Do before every drawField call
         {
             playField = new bool[10, 28];
+            foreach(Tetromino piece in fallenPieces)
+            {
+                //Might not work due to pass by value
+                placeBlock(playField, piece);
+            }
+        }
+        public void placeBlock(bool[,] listToPlaceBlock, Tetromino blockToPlace)
+        {
+            for (int i = 0; i < blockToPlace.Pieces.GetLength(0) - blockToPlace.emptyRowsFromBottom(); i++)
+            {
+                for (int c = 0; c < blockToPlace.Pieces.GetLength(1) - blockToPlace.emptyColumnsFromRight(); c++)
+                {
+                    if(blockToPlace.Pieces[i,c])
+                    {
+                        listToPlaceBlock[blockToPlace.X + c, blockToPlace.Y + i] = blockToPlace.Pieces[i, c];
+                    }
+                }
+            }
         }
         public void placeBlock()
         {
@@ -90,7 +112,10 @@ namespace Tetris
             {
                 for (int c = 0; c < currentTetromino.Pieces.GetLength(1) - currentTetromino.emptyColumnsFromRight(); c++)
                 {
-                    playField[currentTetromino.X + c, currentTetromino.Y + i] = currentTetromino.Pieces[i, c];
+                    if(currentTetromino.Pieces[i, c])
+                    {
+                        playField[currentTetromino.X + c, currentTetromino.Y + i] = currentTetromino.Pieces[i, c];
+                    }
                 }
             }
         }
@@ -99,6 +124,8 @@ namespace Tetris
             spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.emptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
             spriteBatch.DrawString(font, "Blanks columns From Right: " + currentTetromino.emptyColumnsFromRight().ToString(), new Vector2(0, 25), Color.White);
             spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0,50), Color.White);
+            spriteBatch.DrawString(font, "X: " + currentTetromino.X.ToString(), new Vector2(0, 75), Color.White);
+            spriteBatch.DrawString(font, "Y: " + currentTetromino.Y.ToString(), new Vector2(0, 100), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
         }
@@ -112,7 +139,6 @@ namespace Tetris
             Texture2D greenSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
             greenSprite.SetData(new Color[] { Color.White });
 
-
             for (int i=0; i < playField.GetLength(0);i++)
             {
                 for(int c = 0; c < playField.GetLength(1); c++)
@@ -125,7 +151,7 @@ namespace Tetris
                     else
                     {
                         spriteBatch.Draw(redSprite, baseblock, Color.White);
-                    }
+                    }                    
                 }
             }
         }
