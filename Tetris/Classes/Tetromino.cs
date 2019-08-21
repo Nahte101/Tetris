@@ -25,6 +25,7 @@ namespace Tetris
         private int x = 5;
         private double y = 0d;
         private double xMovTimer = 0.5d;
+        private double yMovTimer = 0.5d;
 
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
@@ -40,21 +41,30 @@ namespace Tetris
             KeyboardState kState = Keyboard.GetState();
             movX(kState, gameTime);
             fall(gameTime);
+            yMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+            speedUp(kState);
         }
         public void movX(KeyboardState kState, GameTime gameTime)
         {
-            if(x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
+            if (x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
             {
                 x--;
                 xMovTimer = 0.5d;
             }
-            else if(x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
+            else if (x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
             {
                 x++;
                 xMovTimer = 0.5d;
             }
             else
             { xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds; }
+        }
+        public void speedUp(KeyboardState kState)
+        {
+            if (kState.IsKeyDown(Keys.Down))
+            {
+                yMovTimer -= 0.1;
+            }
         }
         public int emptyColumnsFromRight()
         {
@@ -72,6 +82,7 @@ namespace Tetris
             }
             return columnCounter;
         }
+
         public int emptyRowsFromBottom()
         {
             int rowCounter = 0;
@@ -92,6 +103,7 @@ namespace Tetris
             }
             return rowCounter;
         }
+
         public void drawPieces(SpriteBatch spriteBatch,int x, int y)
         {
             Texture2D green = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
@@ -126,27 +138,31 @@ namespace Tetris
             switch(emptyRowsFromBottom())
             {
                 case 0:
-                    if ((int)y + 4 < 28)
+                    if ((int)y + 4 < 28 && yMovTimer <=0)
                     {
-                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                        y += 1;
+                        yMovTimer = 0.5d;
                     }
                     break;
                 case 1:
-                    if((int)y + 3 < 28)
+                    if((int)y + 3 < 28 && yMovTimer <= 0)
                     {
-                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                        y += 1 ;
+                        yMovTimer = 0.5d;
                     }
                     break;
                 case 2:
-                    if ((int)y + 2 < 28)
+                    if ((int)y + 2 < 28 && yMovTimer <= 0)
                     {
-                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                        y += 1;
+                        yMovTimer = 0.5d;
                     }
                     break;
                 case 3:
-                    if ((int)y + 1 < 28)
+                    if ((int)y + 1 < 28 && yMovTimer <= 0)
                     {
-                        y += 1 * gameTime.ElapsedGameTime.TotalSeconds;
+                        y += 1;
+                        yMovTimer = 0.5d;
                     }
                     break;
             }
