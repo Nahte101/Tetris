@@ -48,7 +48,7 @@ namespace Tetris
                 x--;
                 xMovTimer = 0.5d;
             }
-            else if(x < 8 && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
+            else if(x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
             {
                 x++;
                 xMovTimer = 0.5d;

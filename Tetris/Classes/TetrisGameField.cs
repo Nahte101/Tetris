@@ -88,15 +88,16 @@ namespace Tetris
             //insert the current tetrominos values in pieces into the playfield
             for(int i = 0; i < currentTetromino.Pieces.GetLength(0)-currentTetromino.emptyRowsFromBottom();i++)
             {
-                for(int c = 0; c < currentTetromino.Pieces.GetLength(1)-currentTetromino.emptyColumnsFromRight(); c++)
+                for (int c = 0; c < currentTetromino.Pieces.GetLength(1) - currentTetromino.emptyColumnsFromRight(); c++)
                 {
-                    playField[currentTetromino.X+c, currentTetromino.Y+i] = currentTetromino.Pieces[i, c];
+                    playField[currentTetromino.X + c, currentTetromino.Y + i] = currentTetromino.Pieces[i, c];
                 }
             }
         }
         public void drawDebugStats(SpriteBatch spriteBatch,SpriteFont font)
         {
             spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.emptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
+            spriteBatch.DrawString(font, "Blanks columns From Right: " + currentTetromino.emptyColumnsFromRight().ToString(), new Vector2(0, 25), Color.White);
             spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0,50), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
