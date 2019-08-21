@@ -48,7 +48,7 @@ namespace Tetris
                 x--;
                 xMovTimer = 0.5d;
             }
-            else if(x < 19 && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
+            else if(x < 8 && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
             {
                 x++;
                 xMovTimer = 0.5d;
@@ -56,7 +56,23 @@ namespace Tetris
             else
             { xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds; }
         }
-        public int EmptyRowsFromBottom()
+        public int emptyColumnsFromRight()
+        {
+            int columnCounter = 0;
+            for(int c = 3; c >= 0; c--)
+            {
+                int falseCounter = 0;
+                for(int i = 0; i < 4; i++)
+                {
+                    if(pieces[i,c] == false)
+                    { falseCounter++; }
+                    if(falseCounter == 4)
+                    { columnCounter++; }
+                }
+            }
+            return columnCounter;
+        }
+        public int emptyRowsFromBottom()
         {
             int rowCounter = 0;
             for(int i = 3; i >= 0  ;i--)
@@ -107,7 +123,7 @@ namespace Tetris
         }
         public void fall(GameTime gameTime)
         {
-            switch(EmptyRowsFromBottom())
+            switch(emptyRowsFromBottom())
             {
                 case 0:
                     if ((int)y + 4 < 28)

@@ -86,9 +86,9 @@ namespace Tetris
         public void placeBlock()
         {
             //insert the current tetrominos values in pieces into the playfield
-            for(int i = 0; i < currentTetromino.Pieces.GetLength(0)-currentTetromino.EmptyRowsFromBottom();i++)
+            for(int i = 0; i < currentTetromino.Pieces.GetLength(0)-currentTetromino.emptyRowsFromBottom();i++)
             {
-                for(int c = 0; c < currentTetromino.Pieces.GetLength(1); c++)
+                for(int c = 0; c < currentTetromino.Pieces.GetLength(1)-currentTetromino.emptyColumnsFromRight(); c++)
                 {
                     playField[currentTetromino.X+c, currentTetromino.Y+i] = currentTetromino.Pieces[i, c];
                 }
@@ -96,7 +96,7 @@ namespace Tetris
         }
         public void drawDebugStats(SpriteBatch spriteBatch,SpriteFont font)
         {
-            spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.EmptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
+            spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.emptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
             spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0,50), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
@@ -107,9 +107,9 @@ namespace Tetris
         {
             Rectangle baseblock = new Rectangle(0, 0, 10, 10);
             Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            redSprite.SetData(new Color[] { Color.Red });
+            redSprite.SetData(new Color[] { Color.Gray });
             Texture2D greenSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            greenSprite.SetData(new Color[] { Color.Green });
+            greenSprite.SetData(new Color[] { Color.White });
 
 
             for (int i=0; i < playField.GetLength(0);i++)
