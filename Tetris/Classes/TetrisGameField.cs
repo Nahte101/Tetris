@@ -12,9 +12,7 @@ namespace Tetris
 {
     class TetrisGameField
     {
-        
-        private Texture2D blankRectSprite;
-        
+        private Texture2D blankRectSprite;   
         private GraphicsDeviceManager graphics;
 
         int widthInBlocks;
@@ -26,8 +24,10 @@ namespace Tetris
         int startOfFieldX;
         int startOfFieldY;
 
-        private bool[,] playField = new bool[10, 28];
+        int numOfCollisionBlocks = 0;
 
+        private bool[,] playField = new bool[10, 28];
+        private List<List<int>> collisionSkinPositions = new List<List<int>>();//Organised top left to bottom right
         private Tetromino currentTetromino;
         private List<Tetromino> fallenPieces = new List<Tetromino>();
 
@@ -92,6 +92,124 @@ namespace Tetris
                 placeBlock(playField, piece);
             }
         }
+        public int[,] findTetroPositionInField(Tetromino tetro)//Checks from top left of Tetro Position to bottom right of playfield for true statements and logs it as such
+        {/*Might not work when the block has fallen (so we might need to change it so it only finds the actual tetromino piece and not others)
+            possibly through comparing the Tetrominos pieces array with the blocks from the x and y and get the positions based on that*/
+
+            //order of each block positions stored is top left to bottom right (from its x and y)
+
+            
+            int[,] TetrominoPiecePositions = new int[4, 2];
+            int pieceCounter = 0;
+            for (int i = currentTetromino.X; i <= currentTetromino.X+(3-currentTetromino.emptyColumnsFromRight()); i++)
+            {
+                for (int c = currentTetromino.Y; c <= currentTetromino.Y + (3-currentTetromino.emptyRowsFromBottom()); c++)
+                {
+                    if (playField[i, c])
+                    {
+                        TetrominoPiecePositions[pieceCounter, 0] = i;
+                        TetrominoPiecePositions[pieceCounter, 1] = c;
+                        pieceCounter++;
+                    }
+                }
+            }
+            return TetrominoPiecePositions;
+        }
+        public void generateCollision()
+        {
+            //find and store array positions of the current tetrominos squares
+            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);//4 arrays in this array which then has the 2 positions of each block
+
+
+            //Actually generating the Collision Skin
+            int collisionBlockCounter = 0;
+            for(int i =0;i < TetrominoPiecePositions.GetLength(0); i++)
+            {
+                //No assumptions made since rotation could throw a spanner in the works
+                //Add a block top, left, down and right and if its the same as any of the positions in TetroPiecePositions delete it
+                int[,] TopPos = new int[1, 2];
+                int[,] BotPos = new int[1, 2];
+                int[,] LefPos = new int[1, 2];
+                int[,] RigPos = new int[1, 2];
+                
+
+                int x = TetrominoPiecePositions[i, 0];
+                int y = TetrominoPiecePositions[i, 1];
+
+                //Above
+                TopPos[0, 0] = x;
+                TopPos[0, 1] = y + 1;
+                //Below
+                BotPos[0, 0] = x;
+                BotPos[0, 1] = y - 1;
+                //Left
+                LefPos[0, 0] = x - 1;
+                LefPos[0, 1] = y;
+                //Right
+                RigPos[0, 0] = x + 1;
+                RigPos[0, 1] = y;
+
+                    
+                for(int c = 0; c < TetrominoPiecePositions.GetLength(0); c++)
+                {
+                    if(!(LefPos[0,0] == TetrominoPiecePositions[c,0] && LefPos[0,1] == TetrominoPiecePositions[c,1]))
+                    {
+                        collisionSkinPositions.Add(new List<int>());
+                        collisionSkinPositions[collisionBlockCounter].Add(LefPos[0,0]);
+                        collisionSkinPositions[collisionBlockCounter].Add(LefPos[0, 1]);
+                        collisionBlockCounter++;
+                    }
+                    if (!(RigPos[0, 0] == TetrominoPiecePositions[c, 0] && RigPos[0, 1] == TetrominoPiecePositions[c, 1]))
+                    {
+                        collisionSkinPositions.Add(new List<int>());
+                        collisionSkinPositions[collisionBlockCounter].Add(RigPos[0, 0]);
+                        collisionSkinPositions[collisionBlockCounter].Add(RigPos[0, 1]);
+                        collisionBlockCounter++;
+                    }
+                    if (!(TopPos[0, 0] == TetrominoPiecePositions[c, 0] && TopPos[0, 1] == TetrominoPiecePositions[c, 1]))
+                    {
+                        collisionSkinPositions.Add(new List<int>());
+                        collisionSkinPositions[collisionBlockCounter].Add(TopPos[0, 0]);
+                        collisionSkinPositions[collisionBlockCounter].Add(TopPos[0, 1]);
+                        collisionBlockCounter++;
+                    }
+                    if (!(BotPos[0, 0] == TetrominoPiecePositions[c, 0] && BotPos[0, 1] == TetrominoPiecePositions[c, 1]))
+                    {
+                        collisionSkinPositions.Add(new List<int>());
+                        collisionSkinPositions[collisionBlockCounter].Add(BotPos[0, 0]);
+                        collisionSkinPositions[collisionBlockCounter].Add(BotPos[0, 1]);
+                        collisionBlockCounter++;
+                    }
+                }
+                this.numOfCollisionBlocks = collisionBlockCounter;
+            }
+        }
+        public bool isCollide()
+        {
+            //Checks the collisions skin for overlap in the fallen blocks
+            return true;
+        }
+        public void drawCollision(SpriteBatch spriteBatch)
+        {
+            Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            redSprite.SetData(new Color[] { Color.MediumVioletRed });
+            for (int i=0;i < playField.GetLength(0);i++)
+            {
+                for (int c = 0; c < playField.GetLength(1); c++)
+                {
+
+                    Point pointOnScreen = new Point(startOfFieldX + (i * (blockSize + gap)), startOfFieldY + (c * (blockSize + gap)));
+                    Point size = new Point(15,15);
+                    for(int position = 0; position < numOfCollisionBlocks; position++)
+                    {
+                        if (i == collisionSkinPositions[position][0] && c == collisionSkinPositions[position][1])
+                        {
+                            spriteBatch.Draw(redSprite, new Rectangle(pointOnScreen,size), Color.White);
+                        }
+                    }
+                }
+            }
+        }
         public void placeBlock(bool[,] listToPlaceBlock, Tetromino blockToPlace)
         {
             for (int i = 0; i < blockToPlace.Pieces.GetLength(0) - blockToPlace.emptyRowsFromBottom(); i++)
@@ -128,6 +246,31 @@ namespace Tetris
             spriteBatch.DrawString(font, "Y: " + currentTetromino.Y.ToString(), new Vector2(0, 100), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
+            spriteBatch.DrawString(font, "Num collision blocks: "+ numOfCollisionBlocks.ToString() , new Vector2(535 ,50), Color.White);
+
+            //Displaying the tetris pieces positions
+            /* Errors when block overlap should be fixed once collision implemented
+            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);
+            for (int i = 0; i < TetrominoPiecePositions.GetLength(0);i++)
+            {
+                for(int c= 0; c < TetrominoPiecePositions.GetLength(1); c++)
+                {
+                    spriteBatch.DrawString(font, TetrominoPiecePositions[i,c].ToString(), new Vector2(505+(30*c),50*i), Color.White);
+
+                }
+            }
+            */
+            /*
+            //Displaying collision Positions
+            for(int i = 0; i < numOfCollisionBlocks;i++)
+            {
+                for(int c = 0; c < collisionSkinPositions[i].Count; c++)
+                {
+                    spriteBatch.DrawString(font, collisionSkinPositions[i][c].ToString(), new Vector2(505 + (30 * c), 50 * i), Color.White);
+
+                }
+            }
+            */
         }
 
         //For now false will be red and true will be green

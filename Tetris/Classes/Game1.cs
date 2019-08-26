@@ -53,7 +53,8 @@ namespace Tetris
             gameField.update(gameTime);
             gameField.resetField();
             gameField.placeBlock();
-            
+            gameField.generateCollision();
+
             base.Update(gameTime);
         }
 
@@ -66,6 +67,7 @@ namespace Tetris
             gameField.drawOutline(spriteBatch);
             gameField.drawPlayField(spriteBatch);
             gameField.drawDebugStats(spriteBatch, font);
+            gameField.drawCollision(spriteBatch);
 
             spriteBatch.End();
 
