@@ -79,7 +79,7 @@ namespace Tetris
         }
         public void update(GameTime gameTime)
         {
-            currentTetromino.update(gameTime);
+            currentTetromino.update(gameTime, isSideCollide(gameTime));
             if(currentTetromino.isBlockFallen())
             {
                 fallenPieces.Add(currentTetromino);   
@@ -104,17 +104,22 @@ namespace Tetris
             
             int[,] TetrominoPiecePositions = new int[4, 2];
             int pieceCounter = 0;
+
+
             for (int i = currentTetromino.X; i <= currentTetromino.X+(3-currentTetromino.emptyColumnsFromRight()); i++)
             {
-                for (int c = currentTetromino.Y; c <= currentTetromino.Y + (3-currentTetromino.emptyRowsFromBottom()); c++)
+                
+                for (int c = currentTetromino.Y; c <= currentTetromino.Y + (3 - currentTetromino.emptyRowsFromBottom()); c++)
                 {
-                    if (playField[i, c])
+                    if (playField[i, c] )
                     {
                         TetrominoPiecePositions[pieceCounter, 0] = i;
                         TetrominoPiecePositions[pieceCounter, 1] = c;
                         pieceCounter++;
                     }
+                    
                 }
+                
             }
             return TetrominoPiecePositions;
         }
@@ -206,10 +211,35 @@ namespace Tetris
             }
             this.numOfRightCollisionBlocks = collisionCount;
         }
-        public bool isCollide()
+        
+        public bool isSideCollide(GameTime gameTime)
         {
-            //Checks the collisions skin for overlap in the fallen blocks
-            return true;
+            //Change it not check outside of the bounds
+            for (int i=0;i< rSideCollisionSkinPositions.Count;i++)
+            {
+                if (rSideCollisionSkinPositions[i][0] < 10)
+                {
+                    if (playField[rSideCollisionSkinPositions[i][0], rSideCollisionSkinPositions[i][1]])
+                    {
+                        currentTetromino.XMovTimer += gameTime.ElapsedGameTime.TotalSeconds;
+                        return true;
+                    }
+                }
+            }
+            for (int i = 0; i < lSideCollisionSkinPositions.Count; i++)
+            {
+                for (int c = 0; c < lSideCollisionSkinPositions[i].Count; c++)
+                    if (lSideCollisionSkinPositions[i][0] > 0)
+                    {
+                        if (playField[lSideCollisionSkinPositions[i][0], lSideCollisionSkinPositions[i][1]])
+                        {
+                            currentTetromino.XMovTimer += gameTime.ElapsedGameTime.TotalSeconds;
+                            return true;
+                        }
+                    }
+            }
+            return false;
+            
         }
         public void drawCollision(SpriteBatch spriteBatch)
         {

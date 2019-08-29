@@ -30,7 +30,7 @@ namespace Tetris
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
         public int Y { get { return (int)y; } }
-        public double XMovTimer { get { return xMovTimer; } }
+        public double XMovTimer { get { return xMovTimer; } set { value = xMovTimer; } }
 
         public Tetromino(bool[,] pieces)
         {
@@ -40,29 +40,32 @@ namespace Tetris
         {
             return (24 + emptyRowsFromBottom() == y);
         }
-        public void update(GameTime gameTime)
+        public void update(GameTime gameTime, bool xCollide)
         {
             KeyboardState kState = Keyboard.GetState();
-            movX(kState, gameTime);
+            movX(kState, gameTime, xCollide);
             fall(gameTime);
             yMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
             speedUp(kState);
         }
-        public void movX(KeyboardState kState, GameTime gameTime)
+        public void movX(KeyboardState kState, GameTime gameTime, bool xCollide)
         {
-            if (x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
+            if (!xCollide)
             {
-                x--;
-                xMovTimer = 0.5d;
-            }
-            else if (x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
-            {
-                x++;
-                xMovTimer = 0.5d;
-            }
-            else
-            {
-                xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+                if (x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
+                {
+                    x--;
+                    xMovTimer = 0.5d;
+                }
+                else if (x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
+                {
+                    x++;
+                    xMovTimer = 0.5d;
+                }
+                else
+                {
+                    xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+                }
             }
         }
         public void speedUp(KeyboardState kState)
