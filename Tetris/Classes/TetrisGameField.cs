@@ -24,10 +24,14 @@ namespace Tetris
         int startOfFieldX;
         int startOfFieldY;
 
-        int numOfCollisionBlocks = 0;
+        int numOfBottomCollisionBlocks = 0;
+        int numOfLeftCollisionBlocks = 0;
+        int numOfRightCollisionBlocks = 0;
 
         private bool[,] playField = new bool[10, 28];
-        private List<List<int>> collisionSkinPositions = new List<List<int>>();//Organised top left to bottom right
+        private List<List<int>> bottomCollisionSkinPositions = new List<List<int>>();
+        private List<List<int>> lSideCollisionSkinPositions = new List<List<int>>();
+        private List<List<int>> rSideCollisionSkinPositions = new List<List<int>>();
         private Tetromino currentTetromino;
         private List<Tetromino> fallenPieces = new List<Tetromino>();
 
@@ -81,7 +85,6 @@ namespace Tetris
                 fallenPieces.Add(currentTetromino);   
                 chooseBlock();
             }
-
         }
         public void resetField()//Do before every drawField call
         {
@@ -115,74 +118,93 @@ namespace Tetris
             }
             return TetrominoPiecePositions;
         }
-        public void generateCollision()
+        public void generateFallCollision()
         {
-            //find and store array positions of the current tetrominos squares
-            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);//4 arrays in this array which then has the 2 positions of each block
+            //Resetting current coliision positions
+            bottomCollisionSkinPositions = new List<List<int>>();
 
+            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);
+            int collisionCount = 0;
 
-            //Actually generating the Collision Skin
-            int collisionBlockCounter = 0;
-            for(int i =0;i < TetrominoPiecePositions.GetLength(0); i++)
+            for (int i = 0; i < TetrominoPiecePositions.GetLength(0); i++)
             {
-                //No assumptions made since rotation could throw a spanner in the works
-                //Add a block top, left, down and right and if its the same as any of the positions in TetroPiecePositions delete it
-                int[,] TopPos = new int[1, 2];
-                int[,] BotPos = new int[1, 2];
-                int[,] LefPos = new int[1, 2];
-                int[,] RigPos = new int[1, 2];
-                
-
-                int x = TetrominoPiecePositions[i, 0];
-                int y = TetrominoPiecePositions[i, 1];
-
-                //Above
-                TopPos[0, 0] = x;
-                TopPos[0, 1] = y + 1;
-                //Below
-                BotPos[0, 0] = x;
-                BotPos[0, 1] = y - 1;
-                //Left
-                LefPos[0, 0] = x - 1;
-                LefPos[0, 1] = y;
-                //Right
-                RigPos[0, 0] = x + 1;
-                RigPos[0, 1] = y;
-
-                    
-                for(int c = 0; c < TetrominoPiecePositions.GetLength(0); c++)
+                int[] BotPos = {TetrominoPiecePositions[i,0] ,TetrominoPiecePositions[i,1]+1 };
+                bool makeItABlock = true;
+                for (int i2 = 0; i2 < TetrominoPiecePositions.GetLength(0); i2++)
                 {
-                    if(!(LefPos[0,0] == TetrominoPiecePositions[c,0] && LefPos[0,1] == TetrominoPiecePositions[c,1]))
+                    if(BotPos[0] == TetrominoPiecePositions[i2,0] && BotPos[1] == TetrominoPiecePositions[i2, 1])
                     {
-                        collisionSkinPositions.Add(new List<int>());
-                        collisionSkinPositions[collisionBlockCounter].Add(LefPos[0,0]);
-                        collisionSkinPositions[collisionBlockCounter].Add(LefPos[0, 1]);
-                        collisionBlockCounter++;
-                    }
-                    if (!(RigPos[0, 0] == TetrominoPiecePositions[c, 0] && RigPos[0, 1] == TetrominoPiecePositions[c, 1]))
-                    {
-                        collisionSkinPositions.Add(new List<int>());
-                        collisionSkinPositions[collisionBlockCounter].Add(RigPos[0, 0]);
-                        collisionSkinPositions[collisionBlockCounter].Add(RigPos[0, 1]);
-                        collisionBlockCounter++;
-                    }
-                    if (!(TopPos[0, 0] == TetrominoPiecePositions[c, 0] && TopPos[0, 1] == TetrominoPiecePositions[c, 1]))
-                    {
-                        collisionSkinPositions.Add(new List<int>());
-                        collisionSkinPositions[collisionBlockCounter].Add(TopPos[0, 0]);
-                        collisionSkinPositions[collisionBlockCounter].Add(TopPos[0, 1]);
-                        collisionBlockCounter++;
-                    }
-                    if (!(BotPos[0, 0] == TetrominoPiecePositions[c, 0] && BotPos[0, 1] == TetrominoPiecePositions[c, 1]))
-                    {
-                        collisionSkinPositions.Add(new List<int>());
-                        collisionSkinPositions[collisionBlockCounter].Add(BotPos[0, 0]);
-                        collisionSkinPositions[collisionBlockCounter].Add(BotPos[0, 1]);
-                        collisionBlockCounter++;
+                        makeItABlock = false;
                     }
                 }
-                this.numOfCollisionBlocks = collisionBlockCounter;
+                if(makeItABlock)
+                {
+                    bottomCollisionSkinPositions.Add(new List<int>());
+                    bottomCollisionSkinPositions[collisionCount].Add(BotPos[0]);
+                    bottomCollisionSkinPositions[collisionCount].Add(BotPos[1]);
+                    collisionCount++;
+                }
+                
             }
+            this.numOfBottomCollisionBlocks = collisionCount;
+        }
+        public void generateLSideCollision()
+        {
+            //Resetting current coliision positions
+            lSideCollisionSkinPositions = new List<List<int>>();
+
+            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);
+            int collisionCount = 0;
+            for (int i = 0; i < TetrominoPiecePositions.GetLength(0); i++)
+            {
+                int[] lefPos = { TetrominoPiecePositions[i, 0] - 1, TetrominoPiecePositions[i, 1] };
+                bool makeItABlock = true;
+                for (int i2 = 0; i2 < TetrominoPiecePositions.GetLength(0); i2++)
+                {
+                    if (lefPos[0] == TetrominoPiecePositions[i2, 0] && lefPos[1] == TetrominoPiecePositions[i2, 1])
+                    {
+                        makeItABlock = false;
+                    }
+                }
+                if (makeItABlock)
+                {
+                    lSideCollisionSkinPositions.Add(new List<int>());
+                    lSideCollisionSkinPositions[collisionCount].Add(lefPos[0]);
+                    lSideCollisionSkinPositions[collisionCount].Add(lefPos[1]);
+                    collisionCount++;
+                }
+
+            }
+            this.numOfRightCollisionBlocks = collisionCount;
+        }
+        public void generateRSideCollision()
+        {
+            //Resetting current coliision positions
+            rSideCollisionSkinPositions = new List<List<int>>();
+
+            int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);
+            int collisionCount = 0;
+            for (int i = 0; i < TetrominoPiecePositions.GetLength(0); i++)
+            {
+                int[] rigPos = { TetrominoPiecePositions[i, 0] + 1, TetrominoPiecePositions[i, 1] };
+                bool makeItABlock = true;
+                for (int i2 = 0; i2 < TetrominoPiecePositions.GetLength(0); i2++)
+                {
+                    if (rigPos[0] == TetrominoPiecePositions[i2, 0] && rigPos[1] == TetrominoPiecePositions[i2, 1])
+                    {
+                        makeItABlock = false;
+                    }
+                }
+                if (makeItABlock)
+                {
+                    rSideCollisionSkinPositions.Add(new List<int>());
+                    rSideCollisionSkinPositions[collisionCount].Add(rigPos[0]);
+                    rSideCollisionSkinPositions[collisionCount].Add(rigPos[1]);
+                    collisionCount++;
+                }
+                
+            }
+            this.numOfRightCollisionBlocks = collisionCount;
         }
         public bool isCollide()
         {
@@ -193,18 +215,29 @@ namespace Tetris
         {
             Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
             redSprite.SetData(new Color[] { Color.MediumVioletRed });
+            Texture2D greenSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            greenSprite.SetData(new Color[] { Color.Green });
+            Texture2D blueSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            blueSprite.SetData(new Color[] { Color.Blue });
             for (int i=0;i < playField.GetLength(0);i++)
             {
                 for (int c = 0; c < playField.GetLength(1); c++)
                 {
-
                     Point pointOnScreen = new Point(startOfFieldX + (i * (blockSize + gap)), startOfFieldY + (c * (blockSize + gap)));
                     Point size = new Point(15,15);
-                    for(int position = 0; position < numOfCollisionBlocks; position++)
+                    for(int position = 0; position < numOfBottomCollisionBlocks; position++)
                     {
-                        if (i == collisionSkinPositions[position][0] && c == collisionSkinPositions[position][1])
+                        if (i == bottomCollisionSkinPositions[position][0] && c == bottomCollisionSkinPositions[position][1])
                         {
                             spriteBatch.Draw(redSprite, new Rectangle(pointOnScreen,size), Color.White);
+                        }
+                        /*if (i == lSideCollisionSkinPositions[position][0] && c == lSideCollisionSkinPositions[position][1])
+                        {
+                            spriteBatch.Draw(greenSprite, new Rectangle(pointOnScreen, size), Color.White);
+                        }*/
+                        if (i == rSideCollisionSkinPositions[position][0] && c == rSideCollisionSkinPositions[position][1])
+                        {
+                           spriteBatch.Draw(blueSprite, new Rectangle(pointOnScreen, size), Color.White);
                         }
                     }
                 }
@@ -246,10 +279,14 @@ namespace Tetris
             spriteBatch.DrawString(font, "Y: " + currentTetromino.Y.ToString(), new Vector2(0, 100), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
-            spriteBatch.DrawString(font, "Num collision blocks: "+ numOfCollisionBlocks.ToString() , new Vector2(535 ,50), Color.White);
-
+            /*
+            spriteBatch.DrawString(font, "Num bottom collision blocks: "+ numOfBottomCollisionBlocks.ToString() , new Vector2(550 ,50), Color.White);
+            spriteBatch.DrawString(font, "Num left collision blocks: " + numOfLeftCollisionBlocks.ToString(), new Vector2(550, 75), Color.White);
+            spriteBatch.DrawString(font, "Num right collision blocks: " + numOfRightCollisionBlocks.ToString(), new Vector2(550, 100), Color.White);
+            */
             //Displaying the tetris pieces positions
-            /* Errors when block overlap should be fixed once collision implemented
+            //Errors when block overlap should be fixed once collision implemented
+            /*
             int[,] TetrominoPiecePositions = findTetroPositionInField(currentTetromino);
             for (int i = 0; i < TetrominoPiecePositions.GetLength(0);i++)
             {
@@ -260,17 +297,19 @@ namespace Tetris
                 }
             }
             */
-            /*
-            //Displaying collision Positions
-            for(int i = 0; i < numOfCollisionBlocks;i++)
-            {
-                for(int c = 0; c < collisionSkinPositions[i].Count; c++)
-                {
-                    spriteBatch.DrawString(font, collisionSkinPositions[i][c].ToString(), new Vector2(505 + (30 * c), 50 * i), Color.White);
 
+            //Displaying collision Positions
+            int i = 0;
+            int c = 0;
+            foreach(List<int> list in lSideCollisionSkinPositions)
+            {
+                foreach(int num in list)
+                {
+                    spriteBatch.DrawString(font, num.ToString(), new Vector2(505 + (30 * c), 50 * i), Color.White);
+                    c++;
                 }
+                i++;
             }
-            */
         }
 
         //For now false will be red and true will be green

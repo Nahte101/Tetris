@@ -53,7 +53,9 @@ namespace Tetris
             gameField.update(gameTime);
             gameField.resetField();
             gameField.placeBlock();
-            gameField.generateCollision();
+            gameField.generateFallCollision();
+            gameField.generateLSideCollision();
+            gameField.generateRSideCollision();
 
             base.Update(gameTime);
         }
