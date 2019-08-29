@@ -80,7 +80,7 @@ namespace Tetris
         public void update(GameTime gameTime)
         {
             currentTetromino.update(gameTime, isSideCollide(gameTime));
-            if(currentTetromino.isBlockFallen())
+            if(currentTetromino.isBlockFallen() || currentTetromino.IsFallen)
             {
                 fallenPieces.Add(currentTetromino);   
                 chooseBlock();
@@ -221,7 +221,6 @@ namespace Tetris
                 {
                     if (playField[rSideCollisionSkinPositions[i][0], rSideCollisionSkinPositions[i][1]])
                     {
-                        currentTetromino.XMovTimer += gameTime.ElapsedGameTime.TotalSeconds;
                         return true;
                     }
                 }
@@ -233,13 +232,27 @@ namespace Tetris
                     {
                         if (playField[lSideCollisionSkinPositions[i][0], lSideCollisionSkinPositions[i][1]])
                         {
-                            currentTetromino.XMovTimer += gameTime.ElapsedGameTime.TotalSeconds;
                             return true;
                         }
                     }
             }
             return false;
             
+        }
+        public bool bottomCollide()
+        {
+            for (int i = 0; i < numOfBottomCollisionBlocks; i++)
+            {
+                if (bottomCollisionSkinPositions[i][0] < playField.GetLength(0))
+                {
+                    if (playField[bottomCollisionSkinPositions[i][0], bottomCollisionSkinPositions[i][1]])
+                    {
+                        currentTetromino.IsFallen = true;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public void drawCollision(SpriteBatch spriteBatch)
         {
@@ -309,6 +322,7 @@ namespace Tetris
             spriteBatch.DrawString(font, "Y: " + currentTetromino.Y.ToString(), new Vector2(0, 100), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
+            spriteBatch.DrawString(font, "Fallen: " + currentTetromino.IsFallen.ToString(), new Vector2(100, 400), Color.White);
             /*
             spriteBatch.DrawString(font, "Num bottom collision blocks: "+ numOfBottomCollisionBlocks.ToString() , new Vector2(550 ,50), Color.White);
             spriteBatch.DrawString(font, "Num left collision blocks: " + numOfLeftCollisionBlocks.ToString(), new Vector2(550, 75), Color.White);

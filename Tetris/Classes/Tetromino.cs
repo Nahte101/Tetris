@@ -26,11 +26,12 @@ namespace Tetris
         private double y = 0d;
         private double xMovTimer = 0.5d;
         private double yMovTimer = 0.3d;
-        private bool isFallen;
+        private bool isFallen = false;
         public bool[,] Pieces { get { return pieces; } }
         public int X { get { return x; } }
         public int Y { get { return (int)y; } }
-        public double XMovTimer { get { return xMovTimer; } set { value = xMovTimer; } }
+        public double XMovTimer { get { return xMovTimer; }}
+        public bool IsFallen { get { return isFallen; } set { isFallen = value; } }
 
         public Tetromino(bool[,] pieces)
         {
@@ -144,38 +145,56 @@ namespace Tetris
         }
         public void fall(GameTime gameTime)
         {
-            switch(emptyRowsFromBottom())
+            if (!isFallen)
             {
-                case 0:
-                    if ((int)y + 4 < 28 && yMovTimer <=0)
-                    {
-                        y += 1;
-                        yMovTimer = 0.5d;
-                    }
-                    break;
-                case 1:
-                    if((int)y + 3 < 28 && yMovTimer <= 0)
-                    {
-                        y += 1 ;
-                        yMovTimer = 0.5d;
-                    }
-                    break;
-                case 2:
-                    if ((int)y + 2 < 28 && yMovTimer <= 0)
-                    {
-                        y += 1;
-                        yMovTimer = 0.5d;
-                    }
-                    break;
-                case 3:
-                    if ((int)y + 1 < 28 && yMovTimer <= 0)
-                    {
-                        y += 1;
-                        yMovTimer = 0.5d;
-                    }
-                    break;
+                switch (emptyRowsFromBottom())
+                {
+                    case 0:
+                        if ((int)y + 4 < 28 && yMovTimer <= 0)
+                        {
+                            y += 1;
+                            yMovTimer = 0.5d;
+                        }
+                        else if (!((int)y + 4 < 28))
+                        {
+                            isFallen = true;
+                        }
+                        break;
+                    case 1:
+                        if ((int)y + 3 < 28 && yMovTimer <= 0)
+                        {
+                            y += 1;
+                            yMovTimer = 0.5d;
+                        }
+                        else if (!((int)y + 3 < 28))
+                        {
+                            isFallen = true;
+                        }
+                        break;
+                    case 2:
+                        if ((int)y + 2 < 28 && yMovTimer <= 0)
+                        {
+                            y += 1;
+                            yMovTimer = 0.5d;
+                        }
+                        else if (!((int)y + 2 < 28))
+                        {
+                            isFallen = true;
+                        }
+                        break;
+                    case 3:
+                        if ((int)y + 1 < 28 && yMovTimer <= 0)
+                        {
+                            y += 1;
+                            yMovTimer = 0.5d;
+                        }
+                        else if (!((int)y + 1 < 28))
+                        {
+                            isFallen = true;
+                        }
+                        break;
+                }
             }
-            
         }
 
     }

@@ -50,7 +50,7 @@ namespace Tetris
                 gameField.chooseBlock();
                 start = true;
             }
-            
+            gameField.bottomCollide();
             gameField.update(gameTime);
             gameField.resetField();
             gameField.placeBlock();
