@@ -70,7 +70,7 @@ namespace Tetris
             gameField.drawOutline(spriteBatch);
             gameField.drawPlayField(spriteBatch);
             gameField.drawDebugStats(spriteBatch, font);
-            gameField.drawCollision(spriteBatch);
+            //gameField.drawCollision(spriteBatch);
 
             spriteBatch.End();
 

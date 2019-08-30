@@ -24,7 +24,7 @@ namespace Tetris
         //x and why are indexs inside of the playfield relative to the top left of pieces in this class
         private int x = 5;
         private double y = 0d;
-        private double xMovTimer = 0.5d;
+        private double xMovTimer = 0.3d;
         private double yMovTimer = 0.3d;
         private bool isFallen = false;
         public bool[,] Pieces { get { return pieces; } }
@@ -41,33 +41,31 @@ namespace Tetris
         {
             return (24 + emptyRowsFromBottom() == y);
         }
-        public void update(GameTime gameTime, bool xCollide)
+        public void update(GameTime gameTime, bool leftCollide, bool rightCollide)
         {
             KeyboardState kState = Keyboard.GetState();
-            movX(kState, gameTime, xCollide);
+            movX(kState, gameTime, leftCollide, rightCollide);
             fall(gameTime);
             yMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
             speedUp(kState);
         }
-        public void movX(KeyboardState kState, GameTime gameTime, bool xCollide)
+        public void movX(KeyboardState kState, GameTime gameTime, bool leftCollide, bool rightCollide)
         {
-            if (!xCollide)
+            if (x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0 && !leftCollide)
             {
-                if (x > 0 && kState.IsKeyDown(Keys.Left) && xMovTimer <= 0)
-                {
-                    x--;
-                    xMovTimer = 0.5d;
-                }
-                else if (x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0)
-                {
-                    x++;
-                    xMovTimer = 0.5d;
-                }
-                else
-                {
-                    xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
-                }
+               x--;
+               xMovTimer = 0.3d;
+            }     
+            else if (x < 6 + emptyColumnsFromRight() && kState.IsKeyDown(Keys.Right) && xMovTimer <= 0 && !rightCollide)
+            {
+                x++;
+                xMovTimer = 0.3d;
             }
+            else
+            {
+                xMovTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            
         }
         public void speedUp(KeyboardState kState)
         {
@@ -142,6 +140,20 @@ namespace Tetris
                     }
                 }
             }
+        }
+        public void rotateL()
+        {
+            for(int i = 0; i < ;i++)
+            {
+                for(int c = 0; c < ;c++)
+                {
+
+                }
+            }
+        }
+        public void rotateR()
+        {
+
         }
         public void fall(GameTime gameTime)
         {

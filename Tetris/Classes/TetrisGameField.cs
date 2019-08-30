@@ -79,7 +79,7 @@ namespace Tetris
         }
         public void update(GameTime gameTime)
         {
-            currentTetromino.update(gameTime, isSideCollide(gameTime));
+            currentTetromino.update(gameTime, isLeftCollide(gameTime),isRightCollide(gameTime));
             if(currentTetromino.isBlockFallen() || currentTetromino.IsFallen)
             {
                 fallenPieces.Add(currentTetromino);   
@@ -212,7 +212,7 @@ namespace Tetris
             this.numOfRightCollisionBlocks = collisionCount;
         }
         
-        public bool isSideCollide(GameTime gameTime)
+        public bool isRightCollide(GameTime gameTime)
         {
             //Change it not check outside of the bounds
             for (int i=0;i< rSideCollisionSkinPositions.Count;i++)
@@ -225,6 +225,12 @@ namespace Tetris
                     }
                 }
             }
+            
+            return false;
+            
+        }
+        public bool isLeftCollide(GameTime gameTime)
+        {
             for (int i = 0; i < lSideCollisionSkinPositions.Count; i++)
             {
                 for (int c = 0; c < lSideCollisionSkinPositions[i].Count; c++)
@@ -237,7 +243,6 @@ namespace Tetris
                     }
             }
             return false;
-            
         }
         public bool bottomCollide()
         {
