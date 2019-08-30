@@ -106,12 +106,12 @@ namespace Tetris
             int pieceCounter = 0;
 
 
-            for (int i = currentTetromino.X; i <= currentTetromino.X+(3-currentTetromino.emptyColumnsFromRight()); i++)
+            for (int i = currentTetromino.X; i < currentTetromino.X+(4-currentTetromino.emptyColumnsFromRight()); i++)
             {
                 
-                for (int c = currentTetromino.Y; c <= currentTetromino.Y + (3 - currentTetromino.emptyRowsFromBottom()); c++)
+                for (int c = currentTetromino.Y; c < currentTetromino.Y + (4 - currentTetromino.emptyRowsFromBottom()); c++)
                 {
-                    if (playField[i, c] )
+                    if (playField[i, c] && currentTetromino.Pieces[c-currentTetromino.Y,i-currentTetromino.X])
                     {
                         TetrominoPiecePositions[pieceCounter, 0] = i;
                         TetrominoPiecePositions[pieceCounter, 1] = c;
