@@ -34,6 +34,7 @@ namespace Tetris
         private List<List<int>> rSideCollisionSkinPositions = new List<List<int>>();
         private Tetromino currentTetromino;
         private List<Tetromino> fallenPieces = new List<Tetromino>();
+        private bool[,] fallenBlocks = new bool[10, 28];
 
         public TetrisGameField(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
         {
@@ -85,15 +86,29 @@ namespace Tetris
                 fallenPieces.Add(currentTetromino);   
                 chooseBlock();
             }
+            List<int> lineInfo = searchForLine();
+            if(lineInfo[0] != 0)
+            {
+                for(int i = 1; i < lineInfo.Count;i++)
+                {
+                    removeLine(lineInfo[i]);
+                }
+                for(int i = 0; i < lineInfo[0];i++)
+                {
+                    moveFallenBlocksDown();
+                }
+                
+            }
         }
         public void resetField()//Do before every drawField call
         {
             playField = new bool[10, 28];
             foreach(Tetromino piece in fallenPieces)
             {
-                //Might not work due to pass by value
-                placeBlock(playField, piece);
+                placeBlock(fallenBlocks, piece);
             }
+            fallenPieces.Clear();
+            placeList(fallenBlocks);
         }
         public int[,] findTetroPositionInField(Tetromino tetro)//Checks from top left of Tetro Position to bottom right of playfield for true statements and logs it as such
         {/*Might not work when the block has fallen (so we might need to change it so it only finds the actual tetromino piece and not others)
@@ -234,7 +249,7 @@ namespace Tetris
             for (int i = 0; i < lSideCollisionSkinPositions.Count; i++)
             {
                 for (int c = 0; c < lSideCollisionSkinPositions[i].Count; c++)
-                    if (lSideCollisionSkinPositions[i][0] > 0)
+                    if (lSideCollisionSkinPositions[i][0] >= 0)
                     {
                         if (playField[lSideCollisionSkinPositions[i][0], lSideCollisionSkinPositions[i][1]])
                         {
@@ -258,6 +273,67 @@ namespace Tetris
                 }
             }
             return false;
+        }
+        //int List stores the first element is the number of lines found and then after that is the y values of the line
+        public List<int> searchForLine()
+        {
+            //Literally just search through playfield for a line of trues
+            List<int> lineInfo = new List<int>();
+
+            int lineCounter = 0;
+
+            List<int> lineNumbers = new List<int>();
+            for (int i = 0; i < fallenBlocks.GetLength(1); i++)
+            {
+                int xBlockCounter = 0;
+                for (int c = 0; c < fallenBlocks.GetLength(0); c++)
+                {
+                    if (fallenBlocks[c, i])
+                    {
+                        xBlockCounter++;
+                    }
+                    if (xBlockCounter == 10)
+                    {
+                        lineCounter++;
+                        lineNumbers.Add(i);
+                        xBlockCounter = 0;
+                    }
+                }
+            }
+            lineInfo.Add(lineCounter);
+            lineInfo.AddRange(lineNumbers);
+            return lineInfo;
+        }
+        //index is the y value for playfield
+        public void removeLine(int lineIndex)
+        {
+            for (int i = 0; i < fallenBlocks.GetLength(1); i++)
+            {
+                if (i == lineIndex)
+                {
+                    for (int c = 0; c < fallenBlocks.GetLength(0); c++)
+                    {
+                        fallenBlocks[c, i] = false;
+                    }
+                }
+            }
+        }
+        public void moveFallenBlocksDown()
+        {
+            bool[,] original = fallenBlocks;
+            bool[,] newFallenBlocks = new bool[10, 28];
+            for (int i = 0; i < original.GetLength(0); i++)
+            {
+                for (int c = 0; c < original.GetLength(1); c++)
+                {
+                    if (c < 27)
+                    {
+                        newFallenBlocks[i, c + 1] = original[i, c];
+                    }
+                }
+                fallenBlocks = newFallenBlocks;
+            }
+      
         }
         public void drawCollision(SpriteBatch spriteBatch)
         {
@@ -304,6 +380,17 @@ namespace Tetris
                 }
             }
         }
+        //Should be the same size as playfield
+        public void placeList(bool[,] listToCopy)
+        {
+            for (int i = 0; i < listToCopy.GetLength(0); i++)
+            {
+                for (int c = 0; c < listToCopy.GetLength(1); c++)
+                {
+                    playField[i,c] = listToCopy[i, c];
+                }
+            }
+        }
         public void placeBlock()
         {
             //insert the current tetrominos values in pieces into the playfield
@@ -318,16 +405,26 @@ namespace Tetris
                 }
             }
         }
-        public void drawDebugStats(SpriteBatch spriteBatch,SpriteFont font)
+        public void drawDebugStats(SpriteBatch spriteBatch, SpriteFont font)
         {
-            spriteBatch.DrawString(font,"Blanks rows From bottom: "+currentTetromino.emptyRowsFromBottom().ToString(),Vector2.Zero,Color.White);
+            spriteBatch.DrawString(font, "Blanks rows From bottom: " + currentTetromino.emptyRowsFromBottom().ToString(), Vector2.Zero, Color.White);
             spriteBatch.DrawString(font, "Blanks columns From Right: " + currentTetromino.emptyColumnsFromRight().ToString(), new Vector2(0, 25), Color.White);
-            spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0,50), Color.White);
+            spriteBatch.DrawString(font, "X move Timer: " + currentTetromino.XMovTimer.ToString(), new Vector2(0, 50), Color.White);
             spriteBatch.DrawString(font, "X: " + currentTetromino.X.ToString(), new Vector2(0, 75), Color.White);
             spriteBatch.DrawString(font, "Y: " + currentTetromino.Y.ToString(), new Vector2(0, 100), Color.White);
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
             spriteBatch.DrawString(font, "Fallen: " + currentTetromino.IsFallen.ToString(), new Vector2(100, 400), Color.White);
+
+            //Testing Searching for a line
+            List<int> lineInfo = searchForLine();
+            spriteBatch.DrawString(font, "Line Amount: " + lineInfo[0].ToString(), new Vector2(505, 350), Color.White);
+            for (int d = 1; d < lineInfo.Count; d++)
+            {
+                spriteBatch.DrawString(font, "Y pos: " + lineInfo[d].ToString(), new Vector2(505, 350 + (30 * d)), Color.White);
+            }
+
+            //spriteBatch.DrawString(font, "Can rotate?: " + canRotate().ToString(), new Vector2(100, 450), Color.White);
             /*
             spriteBatch.DrawString(font, "Num bottom collision blocks: "+ numOfBottomCollisionBlocks.ToString() , new Vector2(550 ,50), Color.White);
             spriteBatch.DrawString(font, "Num left collision blocks: " + numOfLeftCollisionBlocks.ToString(), new Vector2(550, 75), Color.White);
@@ -350,9 +447,9 @@ namespace Tetris
             //Displaying collision Positions
             int i = 0;
             int c = 0;
-            foreach(List<int> list in lSideCollisionSkinPositions)
+            foreach (List<int> list in lSideCollisionSkinPositions)
             {
-                foreach(int num in list)
+                foreach (int num in list)
                 {
                     spriteBatch.DrawString(font, num.ToString(), new Vector2(505 + (30 * c), 50 * i), Color.White);
                     c++;

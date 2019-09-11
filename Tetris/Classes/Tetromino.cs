@@ -141,20 +141,6 @@ namespace Tetris
                 }
             }
         }
-        public void rotateL()
-        {
-            for(int i = 0; i < ;i++)
-            {
-                for(int c = 0; c < ;c++)
-                {
-
-                }
-            }
-        }
-        public void rotateR()
-        {
-
-        }
         public void fall(GameTime gameTime)
         {
             if (!isFallen)
