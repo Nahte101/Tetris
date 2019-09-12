@@ -56,25 +56,25 @@ namespace Tetris
             switch(num)
             {
                 case 1:
-                    currentTetromino = new Tetromino(Tetromino.I);
+                    currentTetromino = new Tetromino(Tetromino.I, Tetro.I);
                     break;
                 case 2:
-                    currentTetromino = new Tetromino(Tetromino.J);
+                    currentTetromino = new Tetromino(Tetromino.J, Tetro.J);
                     break;
                 case 3:
-                    currentTetromino = new Tetromino(Tetromino.L);
+                    currentTetromino = new Tetromino(Tetromino.L, Tetro.L);
                     break;
                 case 4:
-                    currentTetromino = new Tetromino(Tetromino.O);
+                    currentTetromino = new Tetromino(Tetromino.O, Tetro.O);
                     break;
                 case 5:
-                    currentTetromino = new Tetromino(Tetromino.S);
+                    currentTetromino = new Tetromino(Tetromino.S, Tetro.S);
                     break;
                 case 6:
-                    currentTetromino = new Tetromino(Tetromino.T);
+                    currentTetromino = new Tetromino(Tetromino.T, Tetro.T);
                     break;
                 default:
-                    currentTetromino = new Tetromino(Tetromino.Z);
+                    currentTetromino = new Tetromino(Tetromino.Z, Tetro.Z);
                     break;
             }
         }
@@ -85,6 +85,17 @@ namespace Tetris
             {
                 fallenPieces.Add(currentTetromino);   
                 chooseBlock();
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) && currentTetromino.RotateTimer <= 0 && canRotate())
+            {
+                int[] rotateArray = new int[2];
+                rotateArray[0] = 1;
+                rotateArray[1] = 1;
+
+                currentTetromino.rotate();
+                currentTetromino.updateBlock();
+                currentTetromino.RotateTimer = 0.5d;
+
             }
             List<int> lineInfo = searchForLine();
             if(lineInfo[0] != 0)
@@ -341,15 +352,6 @@ namespace Tetris
                     fallenBlocks[c, i] = false; ;
                 }
             }
-            /*
-            //Adding the copy back in (for testing only)
-            for (int i = 0; i < lineToStopCopy; i++)
-            {
-                for (int c = 0; c < fallenBlocks.GetLength(0); c++)
-                {
-                    fallenBlocks[c, i] = partialCopyOfFallenBlocks[c, i];
-                }
-            }*/
 
             //Adding the copy back in but one down
             for (int i = 0; i < lineToStopCopy; i++)
@@ -360,6 +362,11 @@ namespace Tetris
                 }
             }
         }
+        public bool canRotate()
+        {
+            return true;
+        }
+
         public void drawCollision(SpriteBatch spriteBatch)
         {
             Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
@@ -440,6 +447,7 @@ namespace Tetris
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
             spriteBatch.DrawString(font, "Fallen: " + currentTetromino.IsFallen.ToString(), new Vector2(100, 400), Color.White);
+            spriteBatch.DrawString(font, "RotateTimer: " + currentTetromino.RotateTimer.ToString(), new Vector2(100, 340), Color.White);
 
             //Testing Searching for a line
             List<int> lineInfo = searchForLine();
@@ -487,10 +495,12 @@ namespace Tetris
         public void drawPlayField(SpriteBatch spriteBatch)
         {
             Rectangle baseblock = new Rectangle(0, 0, 10, 10);
-            Texture2D redSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            redSprite.SetData(new Color[] { Color.Gray });
-            Texture2D greenSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            greenSprite.SetData(new Color[] { Color.White });
+            Texture2D greySprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            greySprite.SetData(new Color[] { Color.Gray });
+            Texture2D whiteSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            whiteSprite.SetData(new Color[] { currentTetromino.Colour });
+
+            int[,] tetroPos = findTetroPositionInField(currentTetromino);
 
             for (int i=0; i < playField.GetLength(0);i++)
             {
@@ -499,11 +509,12 @@ namespace Tetris
                     baseblock.Location = new Point(startOfFieldX+(i*(blockSize + gap) )  ,startOfFieldY+( c* (blockSize + gap) ) );
                     if(playField[i,c])
                     {
-                        spriteBatch.Draw(greenSprite,baseblock,Color.White);
+                        spriteBatch.Draw(whiteSprite, baseblock, Color.White);
+                        
                     }
                     else
                     {
-                        spriteBatch.Draw(redSprite, baseblock, Color.White);
+                        spriteBatch.Draw(greySprite, baseblock, Color.White);
                     }                    
                 }
             }
