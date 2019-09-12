@@ -93,10 +93,9 @@ namespace Tetris
                 {
                     removeLine(lineInfo[i]);
                 }
-                for(int i = 0; i < lineInfo[0];i++)
-                {
-                    moveFallenBlocksDown();
-                }
+                for(int c = 1; c < lineInfo.Count;c++)
+                { moveFallenBlocksDown(lineInfo[c]); }
+
                 
             }
         }
@@ -318,22 +317,48 @@ namespace Tetris
                 }
             }
         }
-        public void moveFallenBlocksDown()
+        public void moveFallenBlocksDown(int lineToStopCopy)
         {
-            bool[,] original = fallenBlocks;
-            bool[,] newFallenBlocks = new bool[10, 28];
-            for (int i = 0; i < original.GetLength(0); i++)
+            /*Copy everything from the top of fallenBlocks to the line where the line was removed
+             * then remove everything in the whole area where the original of the copy existed in fallenblocks
+             * then add the copy into fallenBlocks but one row down more in fallenBlocks
+                          
+             */
+            bool[,] partialCopyOfFallenBlocks = new bool[10, lineToStopCopy];
+            //Copying from fallenBlocks
+            for (int i = 0; i < lineToStopCopy; i++)
             {
-                for (int c = 0; c < original.GetLength(1); c++)
+                for(int c = 0; c < fallenBlocks.GetLength(0); c++)
                 {
-                    if (c < 27)
-                    {
-                        newFallenBlocks[i, c + 1] = original[i, c];
-                    }
+                    partialCopyOfFallenBlocks[c, i] = fallenBlocks[c,i];
                 }
-                fallenBlocks = newFallenBlocks;
             }
-      
+            //Removing the copied part
+            for (int i = 0; i < lineToStopCopy; i++)
+            {
+                for(int c = 0; c < fallenBlocks.GetLength(0); c++)
+                {
+                    fallenBlocks[c, i] = false; ;
+                }
+            }
+            /*
+            //Adding the copy back in (for testing only)
+            for (int i = 0; i < lineToStopCopy; i++)
+            {
+                for (int c = 0; c < fallenBlocks.GetLength(0); c++)
+                {
+                    fallenBlocks[c, i] = partialCopyOfFallenBlocks[c, i];
+                }
+            }*/
+
+            //Adding the copy back in but one down
+            for (int i = 0; i < lineToStopCopy; i++)
+            {
+                for (int c = 0; c < fallenBlocks.GetLength(0); c++)
+                {
+                    fallenBlocks[c, i+1] = partialCopyOfFallenBlocks[c, i];
+                }
+            }
         }
         public void drawCollision(SpriteBatch spriteBatch)
         {
