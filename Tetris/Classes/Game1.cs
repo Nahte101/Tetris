@@ -62,6 +62,7 @@ namespace Tetris
 
                 base.Update(gameTime);
             }
+            
         }
 
         protected override void Draw(GameTime gameTime)
@@ -74,7 +75,10 @@ namespace Tetris
             gameField.drawPlayField(spriteBatch);
             gameField.drawDebugStats(spriteBatch, font);
             //gameField.drawCollision(spriteBatch);
-
+            if (gameField.gameOver)
+            {
+                spriteBatch.DrawString(font, "GAMEOVER ", new Vector2(100, 100), Color.White);
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);

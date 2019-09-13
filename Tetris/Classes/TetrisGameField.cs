@@ -540,7 +540,7 @@ namespace Tetris
         {
             Rectangle baseblock = new Rectangle(0, 0, 10, 10);
             Texture2D greySprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-            greySprite.SetData(new Color[] { Color.Gray });
+            greySprite.SetData(new Color[] { Color.Black });
             Texture2D whiteSprite = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
             whiteSprite.SetData(new Color[] { currentTetromino.Colour });
 
