@@ -35,6 +35,9 @@ namespace Tetris
         private Tetromino currentTetromino;
         private List<Tetromino> fallenPieces = new List<Tetromino>();
         private bool[,] fallenBlocks = new bool[10, 28];
+        public bool gameOver = false;
+
+        public bool GameOver { get { return gameOver; } }
 
         public TetrisGameField(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
         {
@@ -80,13 +83,13 @@ namespace Tetris
         }
         public void update(GameTime gameTime)
         {
-            currentTetromino.update(gameTime, isLeftCollide(gameTime),isRightCollide(gameTime));
+            currentTetromino.update(gameTime, isLeftCollide(),isRightCollide());
             if(currentTetromino.isBlockFallen() || currentTetromino.IsFallen)
             {
                 fallenPieces.Add(currentTetromino);   
                 chooseBlock();
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) && currentTetromino.RotateTimer <= 0 && canRotate())
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) && currentTetromino.RotateTimer <= 0 && canRotate() && currentTetromino.X + (4-currentTetromino.emptyColumnsFromRight()) < 10)
             {
                 int[] rotateArray = new int[2];
                 rotateArray[0] = 1;
@@ -107,7 +110,10 @@ namespace Tetris
                 for(int c = 1; c < lineInfo.Count;c++)
                 { moveFallenBlocksDown(lineInfo[c]); }
 
-                
+            }
+            if(!canRotate() && currentTetromino.Y == 0)
+            {
+                gameOver = true;
             }
         }
         public void resetField()//Do before every drawField call
@@ -237,7 +243,7 @@ namespace Tetris
             this.numOfRightCollisionBlocks = collisionCount;
         }
         
-        public bool isRightCollide(GameTime gameTime)
+        public bool isRightCollide()
         {
             //Change it not check outside of the bounds
             for (int i=0;i< rSideCollisionSkinPositions.Count;i++)
@@ -254,7 +260,7 @@ namespace Tetris
             return false;
             
         }
-        public bool isLeftCollide(GameTime gameTime)
+        public bool isLeftCollide()
         {
             for (int i = 0; i < lSideCollisionSkinPositions.Count; i++)
             {
@@ -364,6 +370,43 @@ namespace Tetris
         }
         public bool canRotate()
         {
+            //Go through all fallenBlocks and cycle through all Rotations and if any of them are inside the fallenBlocks return false
+            var rotations = Enum.GetValues(typeof(Tetro));
+            Tetro ogType = currentTetromino.Type;
+            int[,] currentTetroPos;
+            for (int i=0;i < fallenBlocks.GetLength(0);i++)
+            {
+                for(int c = 0; c < fallenBlocks.GetLength(1);c++)
+                {
+                    foreach(Tetro rotation in rotations)
+                    {
+                        currentTetromino.Type = rotation;
+                        currentTetromino.updateBlockNoRestriction();
+                        try
+                        {
+                            currentTetroPos = findTetroPositionInField(currentTetromino);
+                        }
+                        catch
+                        {
+                            currentTetromino.Type = ogType;
+                            currentTetromino.updateBlockNoRestriction();
+                            return false;
+                        }
+                        for(int pos=0; pos < currentTetroPos.GetLength(0); pos++)
+                        {
+                            if (currentTetroPos[pos,0] == i && fallenBlocks[i,c] && currentTetroPos[pos,1] == c)
+                            {
+                                currentTetromino.Type = ogType;
+                                currentTetromino.updateBlockNoRestriction();
+                                return false;
+                            }
+                        }
+                    }
+                }
+                
+            }
+            currentTetromino.Type = ogType;
+            currentTetromino.updateBlockNoRestriction();
             return true;
         }
 
@@ -447,6 +490,7 @@ namespace Tetris
 
             currentTetromino.drawPieces(spriteBatch, 100, 100);
             spriteBatch.DrawString(font, "Fallen: " + currentTetromino.IsFallen.ToString(), new Vector2(100, 400), Color.White);
+            spriteBatch.DrawString(font, "CanRotate: " + canRotate().ToString(), new Vector2(100, 360), Color.White);
             spriteBatch.DrawString(font, "RotateTimer: " + currentTetromino.RotateTimer.ToString(), new Vector2(100, 340), Color.White);
 
             //Testing Searching for a line

@@ -50,15 +50,18 @@ namespace Tetris
                 gameField.chooseBlock();
                 start = true;
             }
-            gameField.bottomCollide();
-            gameField.update(gameTime);
-            gameField.resetField();
-            gameField.placeBlock();
-            gameField.generateFallCollision();
-            gameField.generateLSideCollision();
-            gameField.generateRSideCollision();
+            if (!gameField.gameOver)
+            {
+                gameField.bottomCollide();
+                gameField.update(gameTime);
+                gameField.resetField();
+                gameField.placeBlock();
+                gameField.generateFallCollision();
+                gameField.generateLSideCollision();
+                gameField.generateRSideCollision();
 
-            base.Update(gameTime);
+                base.Update(gameTime);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
