@@ -1,2 +1,3 @@
 # Tetris
-Tetris in C# using MonoGame
+Tetris in C# using MonoGame/XNA
+
